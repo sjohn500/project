@@ -12,7 +12,9 @@ st.caption("v1 demo — trained on jollof rice & egusi soup")
 @st.cache_resource
 def load_model():
     device = torch.device("cpu")
-    ckpt = torch.load("models/foodlens_v2.pt", map_location=device, weights_only=False)
+    from pathlib import Path
+    MODEL_PATH = Path(__file__).parent / "models" / "foodlens_v2.pt"
+    ckpt = torch.load(MODEL_PATH, map_location=device, weights_only=False)
     model = models.mobilenet_v2(weights=None)
     model.classifier[1] = nn.Linear(model.last_channel, len(ckpt["classes"]))
     model.load_state_dict(ckpt["model_state"])
@@ -30,7 +32,7 @@ preprocess = transforms.Compose([
 HEALTH = {
     "jollof_rice": {
         "name": "Jollof Rice",
-        "emoji": "��",
+        "emoji": "🍚",
         "warnings": [
             "High in carbohydrates — blood sugar spike",
             "Fried in oil — high fat content",
