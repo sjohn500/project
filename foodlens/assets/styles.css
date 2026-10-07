@@ -1,97 +1,173 @@
 /* =========================================================
-   FoodLens — Professional Theme
+   ChopWell — Warm Hospitality Wellness Theme
    ========================================================= */
 
+/* Hide Streamlit chrome */
 #MainMenu, footer, header { visibility: hidden; }
 a.anchor-link { display: none; }
 [data-testid="stHeaderActionElements"] { display: none; }
 
+/* ---------- Base ---------- */
 html, body, [class*="css"] {
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto,
                  "Helvetica Neue", Arial, sans-serif;
-    color: #0F172A;
+    color: #1A1A1A;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
 
-.block-container {
-    max-width: 960px;
-    padding-top: 3rem;
-    padding-bottom: 3rem;
+/* Warm cream page background */
+.stApp {
+    background: #FBF7F0;
 }
 
+.block-container {
+    max-width: 920px;
+    padding-top: 3rem;
+    padding-bottom: 4rem;
+}
+
+/* ---------- Page header ---------- */
 .page-header {
-    border-bottom: 2px solid #0F172A;
     padding-bottom: 1.25rem;
     margin-bottom: 2rem;
+    border-bottom: 1px solid #E8DFD0;
 }
 .page-header h1 {
-    font-size: 2.1rem;
-    font-weight: 800;
+    font-family: Georgia, "Iowan Old Style", "Times New Roman", serif;
+    font-size: 2.4rem;
+    font-weight: 700;
     letter-spacing: -0.02em;
-    margin: 0 0 0.4rem 0;
-    color: #0F172A;
+    margin: 0 0 0.35rem 0;
+    color: #2D5016;
+    line-height: 1.1;
 }
-.page-header .sub {
-    font-size: 1rem;
-    color: #475569;
+.page-header .tagline {
+    font-size: 1.05rem;
+    color: #6B6250;
     margin: 0;
+    font-style: italic;
+    font-family: Georgia, "Iowan Old Style", serif;
 }
 
-h2, h3 { color: #0F172A; letter-spacing: -0.01em; }
-h2 { font-size: 1.4rem; margin-top: 2rem; }
-h3 { font-size: 1.15rem; margin-top: 1.75rem; margin-bottom: 0.6rem; }
-
-.info-card {
-    background: #F8FAFC;
-    border: 1px solid #E2E8F0;
-    border-left: 3px solid #0F766E;
-    border-radius: 6px;
-    padding: 1rem 1.25rem;
-    margin-bottom: 1rem;
-    color: #334155;
-    font-size: 0.95rem;
-    line-height: 1.65;
+/* ---------- Section headings ---------- */
+h2, h3 {
+    color: #1A1A1A;
+    letter-spacing: -0.01em;
 }
-.info-card strong { color: #0F172A; }
+h2 {
+    font-size: 1.35rem;
+    margin-top: 2.25rem;
+    font-weight: 600;
+}
+h3 {
+    font-size: 1.1rem;
+    margin-top: 1.75rem;
+    margin-bottom: 0.6rem;
+    font-weight: 600;
+}
 
-.result-panel {
-    border: 1px solid #E2E8F0;
-    border-radius: 8px;
-    padding: 1.5rem;
+/* ---------- Intro / info card ---------- */
+.intro-card {
     background: #FFFFFF;
-    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.04);
+    border: 1px solid #EBE3D5;
+    border-radius: 14px;
+    padding: 1.6rem 1.75rem;
+    margin-bottom: 1.25rem;
+    color: #3F3A2E;
+    font-size: 0.98rem;
+    line-height: 1.7;
+    box-shadow: 0 1px 3px rgba(45, 80, 22, 0.04);
+}
+.intro-card strong { color: #2D5016; font-weight: 600; }
+
+/* ---------- Chip / pill list for supported dishes ---------- */
+.chip {
+    display: inline-block;
+    background: #F1F5E9;
+    color: #2D5016;
+    padding: 0.4rem 0.9rem;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    margin: 0.25rem 0.35rem 0.25rem 0;
+    border: 1px solid #DDE5C8;
+}
+.chip-muted {
+    background: #F3F0EA;
+    color: #A39B8B;
+    border-color: #E8E2D5;
+}
+
+/* ---------- Result panel ---------- */
+.result-panel {
+    background: #FFFFFF;
+    border: 1px solid #EBE3D5;
+    border-radius: 14px;
+    padding: 1.75rem;
+    box-shadow: 0 1px 3px rgba(45, 80, 22, 0.05);
 }
 .result-panel .label {
     font-size: 0.72rem;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: #64748B;
+    letter-spacing: 0.1em;
+    color: #8A8067;
     font-weight: 600;
-    margin-bottom: 0.35rem;
+    margin-bottom: 0.4rem;
 }
 .result-panel .dish {
-    font-size: 1.6rem;
+    font-family: Georgia, "Iowan Old Style", serif;
+    font-size: 1.85rem;
     font-weight: 700;
-    color: #0F172A;
-    margin-bottom: 0.5rem;
+    color: #2D5016;
+    margin-bottom: 0.6rem;
     letter-spacing: -0.01em;
+    line-height: 1.15;
 }
 .result-panel .summary {
-    color: #475569;
-    font-size: 0.95rem;
-    line-height: 1.65;
+    color: #4A4436;
+    font-size: 0.98rem;
+    line-height: 1.7;
 }
 
+/* ---------- Body effects (care rows) ---------- */
+.effect-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 0.75rem;
+    margin-top: 1rem;
+}
+.effect-card {
+    background: #FBF7F0;
+    border: 1px solid #EBE3D5;
+    border-radius: 10px;
+    padding: 0.85rem 1rem;
+    text-align: left;
+}
+.effect-card .effect-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #8A8067;
+    font-weight: 600;
+    margin-bottom: 0.2rem;
+}
+.effect-card .effect-value {
+    font-size: 0.95rem;
+    color: #2D5016;
+    font-weight: 600;
+}
+
+/* ---------- Warning rows (mindful notes) ---------- */
 .warn-row {
     display: flex;
     align-items: flex-start;
-    gap: 0.6rem;
-    padding: 0.6rem 0;
-    border-bottom: 1px solid #F1F5F9;
+    gap: 0.7rem;
+    padding: 0.65rem 0;
+    border-bottom: 1px solid #F1EBDD;
     font-size: 0.95rem;
-    color: #334155;
-    line-height: 1.55;
+    color: #3F3A2E;
+    line-height: 1.6;
 }
 .warn-row:last-child { border-bottom: none; }
 
@@ -105,34 +181,49 @@ h3 { font-size: 1.15rem; margin-top: 1.75rem; margin-bottom: 0.6rem; }
     border-radius: 4px;
     white-space: nowrap;
     flex-shrink: 0;
-    margin-top: 2px;
+    margin-top: 3px;
 }
-.pill-high   { background: #FEE2E2; color: #991B1B; }
-.pill-medium { background: #FEF3C7; color: #854D0E; }
-.pill-info   { background: #DBEAFE; color: #1E40AF; }
+.pill-high   { background: #FBE4D5; color: #8A3510; }
+.pill-medium { background: #FBF1D5; color: #7A5C10; }
+.pill-info   { background: #E3EDD3; color: #3B5C1E; }
 
+/* ---------- Footer ---------- */
 .meta {
-    color: #64748B;
+    color: #8A8067;
     font-size: 0.82rem;
-    line-height: 1.75;
+    line-height: 1.8;
+    padding-top: 1rem;
+    border-top: 1px solid #E8DFD0;
+    margin-top: 2rem;
 }
-.meta a { color: #0F766E; text-decoration: none; }
+.meta a { color: #2D5016; text-decoration: none; font-weight: 500; }
 .meta a:hover { text-decoration: underline; }
 
+/* ---------- Upload dropzone ---------- */
 section[data-testid="stFileUploaderDropzone"] {
-    border: 1.5px dashed #CBD5E1;
-    border-radius: 8px;
+    border: 1.5px dashed #C9BFAB;
+    border-radius: 12px;
     background: #FFFFFF;
-    padding: 1.5rem;
-    transition: border-color 0.15s ease;
+    padding: 1.75rem;
+    transition: border-color 0.15s ease, background 0.15s ease;
 }
 section[data-testid="stFileUploaderDropzone"]:hover {
-    border-color: #0F766E;
+    border-color: #2D5016;
+    background: #FBFDF7;
 }
 
-.stProgress > div > div > div > div { background-color: #0F766E; }
+/* ---------- Progress bar accent ---------- */
+.stProgress > div > div > div > div {
+    background-color: #2D5016;
+}
 
+/* ---------- Captions & small text ---------- */
 .stCaption, [data-testid="stCaptionContainer"] {
-    color: #64748B;
+    color: #8A8067;
     font-size: 0.85rem;
+}
+
+/* ---------- Notice box (info) ---------- */
+div[data-testid="stNotification"] {
+    border-radius: 10px;
 }

@@ -9,14 +9,14 @@ from pathlib import Path
 # PAGE CONFIG
 # =========================================================
 st.set_page_config(
-    page_title="FoodLens — Nigerian Food Recognition",
-    page_icon="🥣",
+    page_title="ChopWell — Eat Well, Live Fully",
+    page_icon="🌿",
     layout="centered",
     initial_sidebar_state="collapsed",
 )
 
 # =========================================================
-# STYLING — loaded from assets/styles.css
+# STYLING
 # =========================================================
 CSS_PATH = Path(__file__).parent / "assets" / "styles.css"
 st.markdown(f"<style>{CSS_PATH.read_text()}</style>", unsafe_allow_html=True)
@@ -26,37 +26,34 @@ st.markdown(f"<style>{CSS_PATH.read_text()}</style>", unsafe_allow_html=True)
 # =========================================================
 st.markdown("""
 <div class="page-header">
-    <h1>FoodLens</h1>
-    <p class="sub">Nigerian food recognition &amp; nutritional awareness — v1</p>
+    <h1>🌿 ChopWell</h1>
+    <p class="tagline">Eat well. Live fully.</p>
 </div>
 """, unsafe_allow_html=True)
 
 # =========================================================
 # ABOUT
 # =========================================================
-st.markdown("### What this does")
 st.markdown("""
-<div class="info-card">
-FoodLens identifies Nigerian dishes from a photograph and provides
-general information on how each dish affects your body when consumed
-regularly or in excess.
-<br><br>
-<b>How to use it:</b> upload a clear photo of your food below. The model
-will identify the dish and display a summary of its key ingredients,
-health considerations, and who should be cautious about it.
+<div class="intro-card">
+<strong>Your body deserves mindful choices.</strong><br><br>
+ChopWell helps you understand what's on your plate — and how it treats your
+body. Upload a photo of your meal, and we'll identify the dish, describe how
+your body responds to it, and share mindful guidance on enjoying it well.
 </div>
 """, unsafe_allow_html=True)
 
 st.markdown("### Currently supported")
 st.markdown("""
-- **Jollof Rice** — tomato-pepper rice base
-- **Egusi Soup** — melon-seed soup with leafy greens
-
-*Additional Nigerian dishes are in development.*
-""")
+<span class="chip">🍚 Jollof Rice</span>
+<span class="chip">🥣 Egusi Soup</span>
+<span class="chip chip-muted">🍌 Fried Plantain — soon</span>
+<span class="chip chip-muted">🍢 Suya — soon</span>
+<span class="chip chip-muted">🍥 Pounded Yam — soon</span>
+""", unsafe_allow_html=True)
 
 # =========================================================
-# MODEL LOADING
+# MODEL
 # =========================================================
 @st.cache_resource
 def load_model():
@@ -78,37 +75,58 @@ preprocess = transforms.Compose([
 ])
 
 # =========================================================
-# HEALTH DATABASE
+# KNOWLEDGE BASE
 # =========================================================
-HEALTH = {
+DISHES = {
     "jollof_rice": {
         "name": "Jollof Rice",
-        "summary": "A one-pot rice dish cooked in a tomato and pepper base, seasoned with spices and oil. Widely considered Nigeria's most iconic meal.",
-        "warnings": [
-            ("High in carbohydrates — may cause rapid blood sugar elevation", "high"),
-            ("Prepared with oil — contributes to fat and calorie density", "medium"),
-            ("Spicy — may aggravate ulcers or acid reflux", "medium"),
-            ("Typically served in large portions — easy to overconsume", "medium"),
+        "summary": "A one-pot rice dish slow-cooked in a tomato and pepper base, "
+                   "seasoned with spices, herbs, and oil. Nigeria's most iconic meal.",
+        "effects": {
+            "Energy": "Quick and high",
+            "Blood sugar": "Significant rise",
+            "Fullness": "Lasting",
+        },
+        "mindful_notes": [
+            ("Enjoy in smaller portions if you're managing diabetes", "high"),
+            ("Pair with vegetables or protein to slow glucose absorption", "info"),
+            ("Consider skipping fried sides on the same plate", "medium"),
         ],
-        "avoid_if": ["Diabetes", "Hypertension", "Ulcers / GERD"],
-        "considerations": [
-            "Pair with vegetables or protein to slow glucose absorption",
-            "Best consumed earlier in the day for active individuals",
+        "who_should_pause": [
+            "Diabetes",
+            "Hypertension",
+            "Ulcers or acid reflux",
+        ],
+        "good_for": [
+            "Active days and physical work",
+            "Cold weather meals",
+            "Post-workout recovery",
         ],
     },
     "egusi_soup": {
         "name": "Egusi Soup",
-        "summary": "A thick soup made from ground melon seeds, leafy greens, palm oil, and protein (meat or fish). Commonly eaten with pounded yam or eba.",
-        "warnings": [
-            ("Very high in palm oil — associated with elevated cholesterol", "high"),
-            ("Dense and slow to digest — may cause heaviness", "medium"),
-            ("Contains melon seeds — potential allergen", "medium"),
-            ("Often served with starchy swallows — high total calorie load", "medium"),
+        "summary": "A thick, comforting soup made from ground melon seeds, "
+                   "leafy greens, palm oil, and protein (meat or fish). Often "
+                   "enjoyed with pounded yam or eba.",
+        "effects": {
+            "Energy": "Slow, sustained",
+            "Blood sugar": "Moderate rise",
+            "Fullness": "Very heavy",
+        },
+        "mindful_notes": [
+            ("Very rich in palm oil — enjoy in moderation", "high"),
+            ("Heavy meal — best eaten earlier in the day", "medium"),
+            ("Contains melon seeds — note if you have allergies", "info"),
         ],
-        "avoid_if": ["Cardiovascular conditions", "Nut / seed allergies", "Acid reflux"],
-        "considerations": [
-            "Consume in moderation if managing cholesterol",
-            "Balanced choice for protein intake",
+        "who_should_pause": [
+            "Cardiovascular conditions",
+            "Nut or seed allergies",
+            "Acid reflux",
+        ],
+        "good_for": [
+            "Protein needs",
+            "Cold weather comfort",
+            "Long-lasting fullness",
         ],
     },
 }
@@ -116,9 +134,10 @@ HEALTH = {
 # =========================================================
 # UPLOAD
 # =========================================================
-st.markdown("### Upload a photo")
+st.markdown("### See how your meal treats your body")
+
 uploaded = st.file_uploader(
-    "Choose a food photo",
+    "Upload a photo of your meal",
     type=["jpg", "jpeg", "png", "webp"],
     label_visibility="collapsed",
 )
@@ -139,32 +158,45 @@ if uploaded:
         pred_class = classes[idx]
         confidence = probs[idx].item()
 
-        info = HEALTH.get(pred_class, {})
+        info = DISHES.get(pred_class, {})
         st.markdown(f"""
         <div class="result-panel">
-            <div class="label">Identified dish</div>
+            <div class="label">Your meal</div>
             <div class="dish">{info.get('name', pred_class)}</div>
             <div class="summary">{info.get('summary','')}</div>
         </div>
         """, unsafe_allow_html=True)
 
         st.markdown("<br>", unsafe_allow_html=True)
-        st.markdown("**Confidence**")
+        st.markdown("**Recognition confidence**")
         st.progress(confidence)
         st.caption(f"{confidence:.1%}")
 
         if confidence < 0.70:
             st.info(
-                "Low confidence — try a clearer, well-lit image with the "
+                "Low confidence — try a clearer, well-lit photo with the "
                 "food centered and unobstructed."
             )
 
-    st.markdown("---")
-    st.markdown("### Health considerations")
+    # Body effects grid
+    st.markdown("### How your body responds")
+    effects = info.get("effects", {})
+    if effects:
+        cols = st.columns(len(effects), gap="small")
+        for col, (label, value) in zip(cols, effects.items()):
+            with col:
+                st.markdown(f"""
+                <div class="effect-card">
+                    <div class="effect-label">{label}</div>
+                    <div class="effect-value">{value}</div>
+                </div>
+                """, unsafe_allow_html=True)
 
-    for text, level in info.get("warnings", []):
+    # Mindful notes
+    st.markdown("### Enjoy mindfully")
+    for text, level in info.get("mindful_notes", []):
         pill_class = f"pill-{level}"
-        label = {"high": "High", "medium": "Medium"}.get(level, "")
+        label = {"high": "Note", "medium": "Note", "info": "Tip"}.get(level, "")
         st.markdown(
             f'<div class="warn-row">'
             f'<span class="pill {pill_class}">{label}</span>'
@@ -173,32 +205,31 @@ if uploaded:
             unsafe_allow_html=True,
         )
 
+    # Who should pause + good for
     col_a, col_b = st.columns(2, gap="large")
 
     with col_a:
-        st.markdown("#### Not recommended for")
-        for a in info.get("avoid_if", []):
+        st.markdown("#### Pause and consider if you have")
+        for a in info.get("who_should_pause", []):
             st.markdown(f"- {a}")
 
     with col_b:
-        st.markdown("#### Considerations")
-        for c in info.get("considerations", []):
-            st.markdown(f"- {c}")
+        st.markdown("#### Especially good for")
+        for g in info.get("good_for", []):
+            st.markdown(f"- {g}")
 
 else:
-    st.caption("Upload an image above to see the identification and health notes.")
+    st.caption("Upload a photo above to see how your meal treats your body.")
 
 # =========================================================
 # FOOTER
 # =========================================================
-st.divider()
-
 st.markdown("""
 <div class="meta">
 <b>Model</b> · MobileNetV2 · 92.9% validation accuracy<br>
-<b>Training data</b> · 80 curated images · 2 Nigerian dishes<br>
+<b>Trained on</b> · 80 curated images · 2 Nigerian dishes<br>
 <b>Source</b> · <a href="https://github.com/sjohn500/project">github.com/sjohn500/project</a><br>
-<b>Disclaimer</b> · FoodLens provides general information and is not a substitute
-for professional medical advice.
+<b>Note</b> · ChopWell shares general guidance — it is not medical advice.
+Speak with a healthcare professional for personal decisions.
 </div>
 """, unsafe_allow_html=True)
