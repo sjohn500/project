@@ -1,0 +1,187 @@
+import streamlit as st
+import torch
+import torch.nn as nn
+from torchvision import transforms, models
+from PIL import Image
+from pathlib import Path
+
+# =========================================================
+# PAGE SETUP
+# =========================================================
+st.set_page_config(
+    page_title="FoodLens — Nigerian Food AI",
+    page_icon="🍲",
+    layout="centered",
+)
+
+st.title("🍲 FoodLens")
+st.markdown(
+    "**Snap a Nigerian dish. Know what it is. Learn how it affects your body.**"
+)
+
+# =========================================================
+# WELCOME / ABOUT (only shown before upload)
+# =========================================================
+st.markdown(
+    """
+    ### What is this?
+    FoodLens is an AI-powered food recognizer built for **Nigerian dishes**.
+    Upload a photo of your food, and the app will:
+
+    1. 🧠 **Identify** what dish it is (using a trained neural network)
+    2. ⚠️ **Warn** you about health effects if you eat too much of it
+    3. ❌ **Tell** you who should avoid it (diabetics, high BP, etc.)
+
+    ### Supported dishes (v1)
+    - 🍚 **Jollof Rice** — high carbs, fried, spicy
+    - 🥣 **Egusi Soup** — high fat, palm oil, seed-based
+
+    > More Nigerian dishes are coming soon. This is v1 of an ongoing project.
+
+    ### How to use it
+    1. Take or find a clear photo of your food
+    2. Click **Browse files** below and upload it
+    3. Get instant results + health warnings
+
+    ---
+    """
+)
+
+# =========================================================
+# MODEL LOADING
+# =========================================================
+@st.cache_resource
+def load_model():
+    device = torch.device("cpu")
+    MODEL_PATH = Path(__file__).parent / "models" / "foodlens_v2.pt"
+    ckpt = torch.load(MODEL_PATH, map_location=device, weights_only=False)
+    model = models.mobilenet_v2(weights=None)
+    model.classifier[1] = nn.Linear(model.last_channel, len(ckpt["classes"]))
+    model.load_state_dict(ckpt["model_state"])
+    model.eval()
+    return model, ckpt["classes"], device
+
+model, classes, device = load_model()
+
+# =========================================================
+# IMAGE PREPROCESSING
+# =========================================================
+preprocess = transforms.Compose([
+    transforms.Resize((224, 224)),
+    transforms.ToTensor(),
+    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+])
+
+# =========================================================
+# HEALTH DATABASE
+# =========================================================
+HEALTH = {
+    "jollof_rice": {
+        "name": "Jollof Rice",
+        "emoji": "🍚",
+        "summary": "A one-pot rice dish cooked in a tomato-pepper base with oil and spices. Nigeria's most iconic meal.",
+        "warnings": [
+            "High in carbohydrates — can spike blood sugar quickly",
+            "Fried in oil — high in fat and calories",
+            "Spicy — may irritate ulcers or sensitive stomachs",
+            "Often eaten in large portions — easy to overeat",
+        ],
+        "avoid_if": [
+            "Diabetic — blood sugar spikes",
+            "High blood pressure — sodium + spice",
+            "Ulcer or GERD — pepper irritation",
+        ],
+        "good_for": [
+            "Active people who need energy",
+            "Athletes before training",
+        ],
+    },
+    "egusi_soup": {
+        "name": "Egusi Soup",
+        "emoji": "🥣",
+        "summary": "A thick, rich soup made from ground melon seeds, leafy greens, palm oil, and meat or fish.",
+        "warnings": [
+            "Very high in palm oil — cholesterol risk",
+            "Rich and heavy — slow to digest",
+            "Contains melon seeds — possible allergy concern",
+            "Often paired with pounded yam — heavy meal overall",
+        ],
+        "avoid_if": [
+            "Heart issues — high saturated fat",
+            "Nut or seed allergy",
+            "Acid reflux — heavy digestion",
+        ],
+        "good_for": [
+            "Protein needs — contains meat/fish",
+            "Cold weather — warming and filling",
+        ],
+    },
+}
+
+# =========================================================
+# UPLOAD
+# =========================================================
+st.markdown("---")
+st.markdown("### 📸 Upload your food photo")
+uploaded = st.file_uploader(
+    "Choose a photo (JPG, PNG, or WEBP)",
+    type=["jpg", "jpeg", "png", "webp"],
+    label_visibility="collapsed",
+)
+
+if uploaded:
+    img = Image.open(uploaded).convert("RGB")
+    col1, col2 = st.columns([1, 1])
+
+    with col1:
+        st.image(img, caption="Your photo", use_container_width=True)
+
+    with col2:
+        tensor = preprocess(img).unsqueeze(0).to(device)
+        with torch.no_grad():
+            out = model(tensor)
+            probs = torch.softmax(out, dim=1)[0]
+            idx = probs.argmax().item()
+        pred_class = classes[idx]
+        confidence = probs[idx].item()
+
+        info = HEALTH.get(pred_class, {})
+        st.markdown(f"### {info.get('emoji','🍽️')} {info.get('name', pred_class)}")
+        st.metric("Confidence", f"{confidence:.1%}")
+
+        if info.get("summary"):
+            st.caption(info["summary"])
+
+    # Full-width health info below
+    st.markdown("---")
+    st.markdown("### ⚠️ If you eat too much:")
+    for w in info.get("warnings", []):
+        st.markdown(f"- {w}")
+
+    st.markdown("### ❌ Avoid if you have:")
+    for a in info.get("avoid_if", []):
+        st.markdown(f"- {a}")
+
+    if info.get("good_for"):
+        st.markdown("### ✅ Good for:")
+        for g in info["good_for"]:
+            st.markdown(f"- {g}")
+
+    if confidence < 0.70:
+        st.warning(
+            "Low confidence — the model isn't sure. Try a clearer photo "
+            "with the food well-lit and centered."
+        )
+
+else:
+    st.info("👆 **Upload a photo to get started.**")
+
+# =========================================================
+# FOOTER
+# =========================================================
+st.divider()
+st.caption(
+    "Built with PyTorch + Streamlit | "
+    "FoodLens v1 — trained on 80 images (jollof rice & egusi soup) | "
+    "Not medical advice — consult a doctor for health decisions."
+)

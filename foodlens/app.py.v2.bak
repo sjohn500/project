@@ -1,0 +1,333 @@
+import streamlit as st
+import torch
+import torch.nn as nn
+from torchvision import transforms, models
+from PIL import Image
+from pathlib import Path
+
+# =========================================================
+# PAGE CONFIG
+# =========================================================
+st.set_page_config(
+    page_title="FoodLens — Nigerian Food AI",
+    page_icon="🍲",
+    layout="wide",
+    initial_sidebar_state="collapsed",
+)
+
+# =========================================================
+# CUSTOM CSS — the professional look
+# =========================================================
+st.markdown("""
+<style>
+    /* Hide Streamlit's default menu & footer */
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+    header {visibility: hidden;}
+
+    /* Page background */
+    .stApp {
+        background: linear-gradient(180deg, #FFF8F0 0%, #FFFFFF 100%);
+    }
+
+    /* Hero section */
+    .hero {
+        background: linear-gradient(135deg, #FF6B35 0%, #F7931E 100%);
+        padding: 3rem 2rem;
+        border-radius: 16px;
+        color: white;
+        text-align: center;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 24px rgba(255, 107, 53, 0.2);
+    }
+    .hero h1 {
+        font-size: 3rem;
+        margin: 0 0 0.5rem 0;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+    }
+    .hero p {
+        font-size: 1.25rem;
+        margin: 0;
+        opacity: 0.95;
+    }
+    .hero .badge {
+        display: inline-block;
+        background: rgba(255,255,255,0.2);
+        padding: 0.25rem 0.85rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        margin-top: 1rem;
+        backdrop-filter: blur(10px);
+    }
+
+    /* Cards */
+    .card {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+        border: 1px solid #F0E6DC;
+        height: 100%;
+    }
+    .card h3 {
+        margin: 0 0 0.5rem 0;
+        color: #2D2D2D;
+        font-size: 1.1rem;
+    }
+    .card p {
+        margin: 0;
+        color: #666;
+        font-size: 0.95rem;
+        line-height: 1.5;
+    }
+    .card .emoji {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+    }
+
+    /* Dish chips */
+    .chip {
+        display: inline-block;
+        background: #FFF3E6;
+        color: #C4501A;
+        padding: 0.35rem 0.85rem;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        margin: 0.2rem 0.3rem 0.2rem 0;
+        border: 1px solid #FFD9B8;
+    }
+
+    /* Result box */
+    .result-box {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        border: 2px solid #FF6B35;
+    }
+
+    /* Severity badges */
+    .badge-high   { background: #FEE2E2; color: #991B1B; padding: 0.2rem 0.6rem; border-radius: 6px; font-weight: 600; font-size: 0.8rem; }
+    .badge-medium { background: #FEF3C7; color: #92400E; padding: 0.2rem 0.6rem; border-radius: 6px; font-weight: 600; font-size: 0.8rem; }
+    .badge-ok     { background: #D1FAE5; color: #065F46; padding: 0.2rem 0.6rem; border-radius: 6px; font-weight: 600; font-size: 0.8rem; }
+
+    /* Buttons */
+    .stButton button {
+        background: #FF6B35;
+        color: white;
+        border: none;
+        font-weight: 600;
+    }
+
+    /* Make file uploader bigger */
+    section[data-testid="stFileUploaderDropzone"] {
+        background: #FFF8F0;
+        border: 2px dashed #FF6B35;
+        border-radius: 12px;
+        padding: 2rem;
+    }
+</style>
+""", unsafe_allow_html=True)
+
+# =========================================================
+# HERO
+# =========================================================
+st.markdown("""
+<div class="hero">
+    <h1>🍲 FoodLens</h1>
+    <p>Snap a Nigerian dish — know what it is & how it affects your body.</p>
+    <div class="badge">🤖 AI-powered · 92.9% accuracy · v1</div>
+</div>
+""", unsafe_allow_html=True)
+
+# =========================================================
+# MODEL LOADING
+# =========================================================
+@st.cache_resource
+def load_model():
+    device = torch.device("cpu")
+    MODEL_PATH = Path(__file__).parent / "models" / "foodlens_v2.pt"
+    ckpt = torch.load(MODEL_PATH, map_location=device, weights_only=False)
+    model = models.mobilenet_v2(weights=None)
+    model.classifier[1] = nn.Linear(model.last_channel, len(ckpt["classes"]))
+    model.load_state_dict(ckpt["model_state"])
+    model.eval()
+    return model, ckpt["classes"], device
+
+model, classes, device = load_model()
+
+preprocess = transforms.Compose([
+    transforms.Resize((224, 224)),
+    transforms.ToTensor(),
+    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+])
+
+# =========================================================
+# HEALTH DATABASE
+# =========================================================
+HEALTH = {
+    "jollof_rice": {
+        "name": "Jollof Rice",
+        "emoji": "🍚",
+        "summary": "A one-pot rice dish cooked in tomato-pepper base with oil and spices. Nigeria's most iconic meal.",
+        "warnings": [
+            ("High in carbohydrates — can spike blood sugar quickly", "high"),
+            ("Fried in oil — high in fat and calories", "medium"),
+            ("Spicy — may irritate ulcers or sensitive stomachs", "medium"),
+            ("Easy to overeat — large portions are common", "medium"),
+        ],
+        "avoid_if": ["Diabetic", "High blood pressure", "Ulcer or GERD"],
+        "good_for": ["Active people who need energy", "Pre-training meals"],
+    },
+    "egusi_soup": {
+        "name": "Egusi Soup",
+        "emoji": "🥣",
+        "summary": "A thick, rich soup made from ground melon seeds, leafy greens, palm oil, and meat or fish.",
+        "warnings": [
+            ("Very high in palm oil — cholesterol risk", "high"),
+            ("Rich and heavy — slow to digest", "medium"),
+            ("Contains melon seeds — possible allergy", "medium"),
+            ("Usually paired with pounded yam — heavy meal", "medium"),
+        ],
+        "avoid_if": ["Heart issues", "Nut or seed allergy", "Acid reflux"],
+        "good_for": ["Protein needs", "Cold weather meals"],
+    },
+}
+
+# =========================================================
+# INTRO CARDS (before upload)
+# =========================================================
+col1, col2, col3 = st.columns(3)
+with col1:
+    st.markdown("""
+    <div class="card">
+        <div class="emoji">📸</div>
+        <h3>1. Upload a photo</h3>
+        <p>Take a clear photo of your food. JPG, PNG, or WEBP.</p>
+    </div>
+    """, unsafe_allow_html=True)
+with col2:
+    st.markdown("""
+    <div class="card">
+        <div class="emoji">🧠</div>
+        <h3>2. AI identifies it</h3>
+        <p>A neural network trained on Nigerian dishes recognizes what's on your plate.</p>
+    </div>
+    """, unsafe_allow_html=True)
+with col3:
+    st.markdown("""
+    <div class="card">
+        <div class="emoji">⚠️</div>
+        <h3>3. Know the risks</h3>
+        <p>Learn what happens if you eat too much — and who should avoid it.</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+st.markdown("<br>", unsafe_allow_html=True)
+
+# =========================================================
+# SUPPORTED DISHES
+# =========================================================
+st.markdown("#### 🍽️ Currently supported")
+st.markdown("""
+<span class="chip">🍚 Jollof Rice</span>
+<span class="chip">🥣 Egusi Soup</span>
+<span class="chip" style="opacity:0.5;">🍌 Fried Plantain (coming soon)</span>
+<span class="chip" style="opacity:0.5;">🍢 Suya (coming soon)</span>
+<span class="chip" style="opacity:0.5;">🍥 Pounded Yam (coming soon)</span>
+""", unsafe_allow_html=True)
+
+st.markdown("<br>", unsafe_allow_html=True)
+
+# =========================================================
+# UPLOAD + PREDICT
+# =========================================================
+st.markdown("### 📸 Upload your food photo")
+
+uploaded = st.file_uploader(
+    "Choose a photo",
+    type=["jpg", "jpeg", "png", "webp"],
+    label_visibility="collapsed",
+)
+
+if uploaded:
+    img = Image.open(uploaded).convert("RGB")
+    col_img, col_res = st.columns([1, 1], gap="large")
+
+    with col_img:
+        st.image(img, caption="Your photo", use_container_width=True)
+
+    with col_res:
+        tensor = preprocess(img).unsqueeze(0).to(device)
+        with torch.no_grad():
+            out = model(tensor)
+            probs = torch.softmax(out, dim=1)[0]
+            idx = probs.argmax().item()
+        pred_class = classes[idx]
+        confidence = probs[idx].item()
+
+        info = HEALTH.get(pred_class, {})
+
+        st.markdown(f"""
+        <div class="result-box">
+            <h2 style="margin:0;">{info.get('emoji','🍽️')} {info.get('name', pred_class)}</h2>
+            <p style="color:#666;margin:0.5rem 0 1rem 0;">{info.get('summary','')}</p>
+        </div>
+        """, unsafe_allow_html=True)
+
+        st.markdown("<br>", unsafe_allow_html=True)
+        st.markdown("**Confidence**")
+        st.progress(confidence)
+        st.caption(f"{confidence:.1%} confident")
+
+        if confidence < 0.70:
+            st.warning(
+                "⚠️ Low confidence. Try a clearer, well-lit photo with the food centered."
+            )
+
+    # Health warnings below in two columns
+    st.markdown("---")
+    col_warn, col_avoid = st.columns(2, gap="large")
+
+    with col_warn:
+        st.markdown("### ⚠️ If you eat too much")
+        for text, level in info.get("warnings", []):
+            badge = {"high": "High", "medium": "Medium"}.get(level, "")
+            badge_class = f"badge-{level}"
+            st.markdown(
+                f'<span class="{badge_class}">{badge}</span>&nbsp;&nbsp;{text}',
+                unsafe_allow_html=True,
+            )
+
+    with col_avoid:
+        st.markdown("### ❌ Avoid if you have")
+        for a in info.get("avoid_if", []):
+            st.markdown(f"❌ **{a}**")
+
+        if info.get("good_for"):
+            st.markdown("### ✅ Good for")
+            for g in info.get("good_for", []):
+                st.markdown(f"✅ {g}")
+
+else:
+    st.info("👆 **Upload a photo above to get started.**")
+
+# =========================================================
+# FOOTER
+# =========================================================
+st.divider()
+
+col_f1, col_f2, col_f3 = st.columns(3)
+with col_f1:
+    st.caption("🧠 Model: MobileNetV2 · 92.9% val accuracy")
+with col_f2:
+    st.caption("📊 Trained on 80 images · 2 dishes")
+with col_f3:
+    st.caption("�� [GitHub Repo](https://github.com/sjohn500/project)")
+
+st.caption(
+    "⚠️ **Disclaimer:** FoodLens provides general health information, "
+    "not medical advice. Consult a doctor for personal health decisions."
+)
