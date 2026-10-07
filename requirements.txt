@@ -6,3 +6,7 @@ scikit-learn
 jupyter
 joblib
 streamlit
+torch
+torchvision
+Pillow
+kaggle
