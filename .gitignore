@@ -28,3 +28,10 @@ Thumbs.db
 # IDE
 .vscode/
 .idea/
+# FoodLens data (never commit raw images)
+foodlens/data/raw/
+foodlens/data/processed/
+
+# Trained models (too big)
+foodlens/models/*.pt
+foodlens/models/*.pth
