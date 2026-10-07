@@ -1,26 +1,22 @@
-# Day 2 — Starting FoodLens
+# Day 2 — Built my first dataset
 
-## What I did today
-- Decided on the project: FoodLens — snap food → identify + health warnings
-- Chose 5 Nigerian dishes to start with
-- Set up the folder structure
-- Ready to collect photos
-
-## The 5 dishes
-1. Jollof Rice
-2. Egusi Soup
-3. Pounded Yam
-4. Suya
-5. Fried Plantain
-
-## Photo target
-~30-40 photos per dish = ~150-200 total
+## What I did
+- Created foodlens project structure (data/raw, src, notebooks, models)
+- Downloaded 25 jollof rice photos (iStock/Unsplash, legally free)
+- Cleaned and renamed them to jollof_001.jpg ... jollof_025.jpg
+- Wrote build_metadata.py — scans folders, generates metadata.csv
+- Verified dataset in Jupyter with a 12-image grid preview
 
 ## What I learned
-- Building my own dataset is a real ML skill
-- Small focused datasets (5 classes) train faster and are easier to debug
-- I can add more dishes later without rebuilding everything
+- Real ML datasets start messy and need cleaning
+- Folder names = labels (the "ImageFolder" pattern)
+- metadata.csv is the closest thing to a "database" at this scale
+- A data pipeline script is reusable — will work for all future dishes
 
-## Tomorrow
-- Collect photos for jollof rice + egusi soup
-- Set up the first notebook to load and preview them
+## Confusion cleared
+- Training a model = showing examples + adjusting until predictions get good
+- Untrained model = garbage output; trained model = good predictions
+
+## Tomorrow's plan
+- Add second dish (egusi soup or fried plantain) — another 25 photos
+- Start training the first model: jollof vs egusi
