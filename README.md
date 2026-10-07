@@ -1,21 +1,30 @@
-# 🚀 AI Engineer Journey — 30 Day Roadmap
+# AI Engineer Journey — 30 Day Roadmap
 
-Hi, I'm [YOUR NAME]. I'm building 4 production-quality AI projects in 30 days
-to land an AI/ML internship. Every project includes clean code, a live demo,
-and a detailed README.
+**Building production-quality AI projects daily for 30 days.**
 
-## 📦 Projects
+## 🌿 Featured Project: ChopWell
 
-| # | Project | Skills | Demo | Status |
-|---|---------|--------|------|--------|
-| 1 | [House Price Predictor](./week1-house-price) | EDA, sklearn, Streamlit | 🔗 | 🚧 |
-| 2 | Image Classifier Web App | PyTorch, FastAPI, Docker | 🔗 | ⏳ |
-| 3 | RAG Chatbot | Transformers, FAISS, LLM | 🔗 | ⏳ |
-| 4 | AI Document Assistant (Capstone) | Full stack AI | 🔗 | ⏳ |
+**Live app:** https://foodlens-sjohn500.streamlit.app
+
+A Nigerian food AI — snap a photo, identify the dish, learn how it affects your body.
+
+- **92.9%** validation accuracy
+- Built on a self-curated dataset of 80 images
+- PyTorch + MobileNetV2 + Streamlit
+- Deployed on Streamlit Cloud
+
+[Full portfolio summary →](./PORTFOLIO.md)
+
+## 📦 All Projects
+
+| # | Project | Live | Stack |
+|---|---------|------|-------|
+| 1 | [House Price EDA](./week1-house-price) | — | pandas, sklearn |
+| 2 | [ChopWell — Food AI](./foodlens) | [🔗](https://foodlens-sjohn500.streamlit.app) | PyTorch, Streamlit |
 
 ## 🛠️ Skills
-Python • Pandas • Scikit-learn • PyTorch • Hugging Face • FastAPI • Streamlit • Docker • Git
+Python · PyTorch · Streamlit · Pandas · scikit-learn · Git · Docker (soon)
 
 ## 📫 Contact
-- LinkedIn: [your link]
-- Email: [your email]
+- GitHub: [sjohn500](https://github.com/sjohn500)
+- Email: johnserahnaomi@gmail.com
