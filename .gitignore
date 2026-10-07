@@ -6,14 +6,10 @@ venv/
 env/
 .venv/
 
-# Data (never commit big files)
+# Data (never commit raw images)
+foodlens/data/raw/
+foodlens/data/processed/
 *.csv
-*.zip
-*.pkl
-*.h5
-*.pt
-*.pth
-data/
 
 # Notebooks
 .ipynb_checkpoints/
@@ -28,10 +24,5 @@ Thumbs.db
 # IDE
 .vscode/
 .idea/
-# FoodLens data (never commit raw images)
-foodlens/data/raw/
-foodlens/data/processed/
 
-# Trained models (too big)
-foodlens/models/*.pt
-foodlens/models/*.pth
+# NOTE: .pt files ARE committed for Streamlit deployment
