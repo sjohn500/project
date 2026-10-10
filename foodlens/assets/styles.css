@@ -83,6 +83,121 @@ h3 {
 
 /* ---------- Chip / pill list for supported dishes ---------- */
 .chip {
+
+/* ---------- Top-3 predictions ---------- */
+.pred-list {
+    margin-top: 1rem;
+}
+.pred-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 0;
+    font-size: 0.95rem;
+}
+.pred-rank {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #8A8067;
+    font-weight: 600;
+    width: 30px;
+    flex-shrink: 0;
+}
+.pred-name {
+    width: 140px;
+    color: #1A1A1A;
+    font-weight: 500;
+    flex-shrink: 0;
+}
+.pred-bar-bg {
+    flex: 1;
+    height: 8px;
+    background: #F1EBDD;
+    border-radius: 4px;
+    overflow: hidden;
+}
+.pred-bar-fill {
+    height: 100%;
+    background: #2D5016;
+    border-radius: 4px;
+}
+.pred-bar-fill.secondary {
+    background: #7A8F5C;
+}
+.pred-pct {
+    width: 55px;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    color: #4A4436;
+    font-weight: 500;
+    flex-shrink: 0;
+}
+
+/* ---------- Confidence warning banner ---------- */
+.low-conf-banner {
+    background: #FBF1D5;
+    border-left: 3px solid #C9A227;
+    padding: 0.85rem 1.1rem;
+    border-radius: 6px;
+    color: #7A5C10;
+    font-size: 0.92rem;
+    margin-top: 1rem;
+    line-height: 1.6;
+}
+
+/* ---------- Feedback block ---------- */
+.feedback-block {
+    background: #F8FAFC;
+    border: 1px solid #E2E8F0;
+    border-radius: 10px;
+    padding: 1rem 1.25rem;
+    margin-top: 1.5rem;
+}
+.feedback-block h4 {
+    margin: 0 0 0.5rem 0;
+    font-size: 0.95rem;
+    color: #1A1A1A;
+    font-weight: 600;
+}
+.feedback-block p {
+    margin: 0 0 0.75rem 0;
+    font-size: 0.85rem;
+    color: #64748B;
+}
+
+/* ---------- Sample images row ---------- */
+.sample-row {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+}
+.sample-card {
+    flex: 1;
+    border: 1px solid #EBE3D5;
+    border-radius: 10px;
+    padding: 0.75rem;
+    background: #FFFFFF;
+    text-align: center;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.sample-card:hover {
+    border-color: #2D5016;
+    box-shadow: 0 2px 10px rgba(45, 80, 22, 0.08);
+}
+.sample-card img {
+    width: 100%;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 6px;
+    margin-bottom: 0.5rem;
+}
+.sample-card .sample-label {
+    font-size: 0.82rem;
+    color: #4A4436;
+    font-weight: 500;
+}
     display: inline-block;
     background: #F1F5E9;
     color: #2D5016;
@@ -226,4 +341,103 @@ section[data-testid="stFileUploaderDropzone"]:hover {
 /* ---------- Notice box (info) ---------- */
 div[data-testid="stNotification"] {
     border-radius: 10px;
+}
+
+/* ---------- Top-3 predictions ---------- */
+.pred-list { margin-top: 1rem; }
+.pred-row {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.5rem 0;
+    font-size: 0.95rem;
+}
+.pred-rank {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #8A8067;
+    font-weight: 600;
+    width: 30px;
+    flex-shrink: 0;
+}
+.pred-name {
+    width: 140px;
+    color: #1A1A1A;
+    font-weight: 500;
+    flex-shrink: 0;
+}
+.pred-bar-bg {
+    flex: 1;
+    height: 8px;
+    background: #F1EBDD;
+    border-radius: 4px;
+    overflow: hidden;
+}
+.pred-bar-fill {
+    height: 100%;
+    background: #2D5016;
+    border-radius: 4px;
+}
+.pred-bar-fill.secondary { background: #7A8F5C; }
+.pred-pct {
+    width: 55px;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    color: #4A4436;
+    font-weight: 500;
+    flex-shrink: 0;
+}
+
+/* ---------- Low confidence banner ---------- */
+.low-conf-banner {
+    background: #FBF1D5;
+    border-left: 3px solid #C9A227;
+    padding: 0.85rem 1.1rem;
+    border-radius: 6px;
+    color: #7A5C10;
+    font-size: 0.92rem;
+    margin-top: 1rem;
+    line-height: 1.6;
+}
+
+/* ---------- Feedback block ---------- */
+.feedback-block {
+    background: #F8FAFC;
+    border: 1px solid #E2E8F0;
+    border-radius: 10px;
+    padding: 1rem 1.25rem;
+    margin-top: 1.5rem;
+}
+.feedback-block h4 {
+    margin: 0 0 0.5rem 0;
+    font-size: 0.95rem;
+    color: #1A1A1A;
+    font-weight: 600;
+}
+.feedback-block p {
+    margin: 0 0 0.75rem 0;
+    font-size: 0.85rem;
+    color: #64748B;
+}
+
+/* ---------- Sample images ---------- */
+.sample-card {
+    border: 1px solid #EBE3D5;
+    border-radius: 10px;
+    padding: 0.75rem;
+    background: #FFFFFF;
+    text-align: center;
+}
+.sample-card img {
+    width: 100%;
+    height: 110px;
+    object-fit: cover;
+    border-radius: 6px;
+    margin-bottom: 0.5rem;
+}
+.sample-card .sample-label {
+    font-size: 0.82rem;
+    color: #4A4436;
+    font-weight: 500;
 }
